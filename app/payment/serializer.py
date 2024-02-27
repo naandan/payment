@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from payment.models import Transaction, TransactionItem, CustomerDetails, Merchant, PaymentMethod
+from payment.models import Transaction, TransactionItem, CustomerDetails
 
 class TransactionItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,8 +12,6 @@ class CustomerDetailsSerializer(serializers.ModelSerializer):
         fields = ["firstname", "lastname", "email", "phone", "address", "city", "province", "country", "postal_code"]
 
 class TransactionSerializer(serializers.ModelSerializer):
-    merchantCode = serializers.CharField()
-
     itemsDetails = TransactionItemSerializer(many=True)
     customerDetails = CustomerDetailsSerializer()
 
@@ -22,7 +20,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Transaction
-        fields = ["invoiceCode", "paymentAmount", "merchantCode", "customerDetails", "itemsDetails", "expire_priod", "callback_url"]
+        fields = ["invoiceCode", "paymentAmount", "customerDetails", "itemsDetails","callback_url"]
 
 class CheckTransactionSerializer(serializers.ModelSerializer):
     merchantCode = serializers.CharField()
@@ -31,3 +29,12 @@ class CheckTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = ["merchantCode", "invoiceCode"]
+
+
+class HeaderSerializer(serializers.Serializer):
+    signature = serializers.CharField()
+    timestamp = serializers.IntegerField()
+    merchantcode = serializers.CharField()
+
+    class Meta:
+        fields = ["signature", "timestamp", "merchantcode"]

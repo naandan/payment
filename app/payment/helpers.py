@@ -3,6 +3,8 @@ import secrets
 import requests
 from datetime import datetime, timedelta
 import pytz
+import hashlib
+from core.settings import BASEURL
 
 def generate_merchant_code():
     unique_numbers = random.sample(range(1, 9), 5)
@@ -37,13 +39,22 @@ def get_datetime_now():
     return now
 
 def get_transaction_url(request, transaction):
-    return f"{request.scheme}://{request.get_host()}/api/v1/payment/pay/?code={transaction.code}"
+    return f"{BASEURL}/api/v1/payment/pay/?code={transaction.code}"
 
 def get_check_payment_url(request, transaction):
-    return f"{request.scheme}://{request.get_host()}/api/v1/payment/check/?code={transaction.code}"
+    return f"{BASEURL}/api/v1/payment/check/?code={transaction.code}"
 
 def check_expired(time_expired):
     print(get_datetime_now())
     print(get_time_id(time_expired))
     if get_datetime_now() > time_expired:
         return True
+
+
+def verify_signature(merchant_code, merchant_key, signature_to_verify, timestamp):
+    timestamp = int(timestamp)
+    expected_signature = hashlib.sha256(f"{merchant_code}{timestamp}{merchant_key}".encode()).hexdigest()
+    if signature_to_verify == expected_signature:
+        return True
+    else:
+        return False
