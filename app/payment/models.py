@@ -40,16 +40,29 @@ class PaymentMethod(models.Model):
         verbose_name_plural = 'Payment Methods'
 
 class Transaction(models.Model):
+    STATUS = (
+        (0, 'Pending'),
+        (1, 'Success'),
+        (2, 'Failed'),
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     code = models.CharField(max_length=10, unique=True)
-    status = models.BooleanField(default=False)
+    invoice_code = models.CharField(max_length=10, unique=True)
+    status = models.PositiveIntegerField(choices=STATUS, default=0)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_method = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE, related_name='transactions')
+    payment_method = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE, related_name='transactions', null=True)
+    merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE, related_name='transactions')
+    callback_url = models.URLField()
+    expire_priod = models.IntegerField()
+    expired_at = models.DateTimeField(null=True)
+    check_count = models.IntegerField(default=0)
+    check_time = models.DateTimeField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return str(self.code)
+        return str(self.code + ' - ' + self.merchant.name)
 
     class Meta:
         verbose_name = 'Transaction'

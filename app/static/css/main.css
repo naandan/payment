@@ -1,0 +1,35 @@
+.payment-item{
+    background-color: red;
+    border-top: 1px solid #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+}
+.payment-item:last-child{
+    border-bottom: 1px solid #ddd;
+}
+.payment-item:hover{
+    background-color: #eee !important;
+    cursor: pointer;
+}
+/* .wrapper{
+    background: url('/static/img/bg-main.jpg');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+} */
+/* .payment-container{
+    background: url('/static/img/bg-main.jpg');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+} */
+
+.h-10{
+    height: 10px !important;
+}
+.bg-warning-opcity-10{
+    background-color: rgba(255, 234, 0, 0.1) !important;
+}
+.Z-100{
+    z-index: 100;
+}
