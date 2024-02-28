@@ -17,7 +17,7 @@ SECRET_KEY = 'django-insecure-*_@iia%$hd-$nqxxe!$8tpblrg2u_zvc#n*=gq^+mrxm3r%8i+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["payment.dev-sti-group.biz.id"]
+ALLOWED_HOSTS = ["payment.dev-sti-group.biz.id", "localhost", "127.0.0.1"]
 CSRF_TRUSTED_ORIGINS = ["https://payment.dev-sti-group.biz.id"]
 
 # Application definition

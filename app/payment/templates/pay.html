@@ -1,5 +1,5 @@
-<div class="absolute" style="max-height: 350px; overflow-y: auto; margin-top:70px;">
-  <div class="bg-white shadow mx-3">
+<div class="content-pay py-md-4 mx-3">
+  <div class="bg-white shadow">
     <div class="accordion" id="accordionPesanan">
       <div class="accordion-item">
         <h2 class="accordion-header">
@@ -17,7 +17,7 @@
     </div>
   </div>
   
-  <div class="shadow my-4 mx-3">
+  <div class="shadow my-4">
     <div class="payment-item bg-white px-4 py-3">
         <div class="row w-100">
           <div class="col-10">
@@ -39,7 +39,7 @@
     </div>
   </div>
 
-  <div class="bg-white shadow m-3">
+  <div class="bg-white shadow mt-3">
     <div class="accordion" id="accordionPayment">
       <div class="accordion-item">
         <h2 class="accordion-header">
@@ -81,39 +81,41 @@
 
 
 
-<div class="position-absolute w-100 bottom-0 Z-100 footer bg-white d-flex justify-content-between align-items-center shadow-lg w-full px-3 py-2 position-absolute w-100 bottom-0">
+<div class="w-100 bottom-0 Z-100 footer bg-white d-flex justify-content-between align-items-center shadow-lg w-full px-3 py-2 w-100 bottom-0">
   <div class="py-1">
     <h6 class="m-0">Total Pembayaran</h6>
     <p class="m-0">Rp. 100.000</p>
   </div>
   <form hx-get="{{url_check}}" method="get" hx-swap="none">
-    <button class="btn btn-primary ms-auto" type="submit">Check Status</button>
+    <button class="sender btn btn-primary ms-auto" type="submit">Check Status</button>
   </form>
 </div>
+
+
 {% block javascripts %}
 <script>
-  document.body.addEventListener('htmx:afterRequest', function(event) {
-    code = event.detail.xhr.response
-    console.log(code)
+  $(document).on('htmx:afterRequest', function(event) {
+    var code = event.detail.xhr.response;
     if (code == '001' || code.startsWith('http')) {
-      Toast.fire({
-        icon: "success",
-        title: "Transaction Success"
-      });
-      setTimeout(function() {
-        window.location.href = code;
-      }, 1500);
-    }else if(code == '002'){
-      Toast.fire({
-        icon: "warning",
-        title: "Transaction Pending"
-      });
-    }else{
-      Toast.fire({
-        icon: "error",
-        title: `Harap coba kembali dalam ${code} menit`
-      });
+        Toast.fire({
+            icon: "success",
+            title: "Transaction Success"
+        });
+        setTimeout(function() {
+            window.location.href = code;
+        }, 1500);
+    } else if (code == '002') {
+        Toast.fire({
+            icon: "warning",
+            title: "Transaction Pending"
+        });
+    } else {
+        Toast.fire({
+            icon: "error",
+            title: "Harap coba kembali dalam " + code + " menit"
+        });
     }
+    $('.sender').prop('disabled', false).text('Check Status');
   });
 </script>
 {% endblock javascripts %}
