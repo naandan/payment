@@ -22,10 +22,12 @@
         <div class="row w-100">
           <div class="col-10">
             <h6>Nomor Rekening</h6>
-            <p class="m-0">7007 0140 0395 8299</p>
+            <p class="m-0" id="account_number">7007 0140 0395 8299</p>
           </div>
           <div class="col-2 d-flex align-items-center justify-content-center">
-            0
+            <p onclick="copyToClipboard('account_number')" class="m-0">
+              <iconify-icon icon="uil:copy" class="copy-btn p-0 m-0"></iconify-icon>
+            </p>
           </div>
         </div>
     </div>
@@ -33,7 +35,13 @@
         <div class="row w-100">
           <div class="col-10">
             <h6>Status Pembayaran</h6>
-            <p class="m-0" id="status">{{ transaction.get_status_display }}</p>
+            <p class="m-0" id="status">
+              {% if transaction.status == 1 %}
+                <span class="badge text-bg-success">{{ transaction.get_status_display }}</span>
+              {% else %}
+                <span class="badge text-bg-warning">{{ transaction.get_status_display }}</span>
+              {% endif %}
+            </p>
           </div>
         </div>
     </div>
@@ -117,5 +125,20 @@
     }
     $('.sender').prop('disabled', false).text('Check Status');
   });
+</script>
+
+<script>
+  function copyToClipboard(target) {
+    var textToCopy = $(`#${target}`).text();
+    var $temp = $('<textarea>');
+    $("body").append($temp);
+    $temp.val(textToCopy).select();
+    document.execCommand('copy');
+    $temp.remove();
+    Toast.fire({
+      icon: "success",
+      title: "Nomor rekening berhasil disalin"
+  });
+  }
 </script>
 {% endblock javascripts %}

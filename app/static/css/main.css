@@ -87,3 +87,15 @@
         align-items: flex-start !important;
     }
 }
+
+.copy-btn{
+    cursor: pointer;
+    color: #878787 !important;
+    font-size: 30px !important;
+}
+.copy-btn:hover{
+    color: #000000 !important;
+    transform: scale(1.2);
+    padding: 4px;
+    transition: all 0.3s;
+}
