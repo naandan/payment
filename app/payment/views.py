@@ -5,7 +5,7 @@ from payment.serializer import TransactionSerializer, HeaderSerializer
 from payment.models import Transaction, Merchant, CustomerDetails, TransactionItem, PaymentMethod
 from django.views.generic import View
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.template.loader import render_to_string
 from payment.helpers import *
 import math
@@ -93,6 +93,9 @@ class PaymentView(View):
         if not transaction:
             return HttpResponseNotFound()
         
+        if transaction.status == 1:
+            return HttpResponseRedirect(transaction.callback_url)
+        
         payment_methods = PaymentMethod.objects.all()
         return render(request, 'payment.html', {
             'payment_methods': payment_methods, 
@@ -108,6 +111,9 @@ class PaymentView(View):
         transaction = Transaction.objects.filter(code=request.GET.get('code')).first()
         if not transaction:
             return HttpResponseNotFound()
+
+        if transaction.status == 1:
+            return HttpResponseRedirect(transaction.callback_url)
         
         payment_method = PaymentMethod.objects.filter(id=payment_method).first()
         if not payment_method:
