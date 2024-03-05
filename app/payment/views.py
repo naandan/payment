@@ -57,7 +57,6 @@ class TransactionCreateView(APIView):
             return Response({'message': 'Invalid header'}, status=status.HTTP_400_BAD_REQUEST)
         
         merchant = Merchant.objects.filter(code=request.headers["merchantcode"]).first()
-        
         if merchant is None:
             return Response({'message': 'Merchant not found'}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -92,7 +91,6 @@ class PaymentView(View):
         transaction = Transaction.objects.filter(code=request.GET.get('code')).first()
         if not transaction:
             return HttpResponseNotFound()
-        
         if transaction.status == 1:
             return HttpResponseRedirect(transaction.callback_url)
         
