@@ -12,14 +12,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*_@iia%$hd-$nqxxe!$8tpblrg2u_zvc#n*=gq^+mrxm3r%8i+'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-*_@iia%$hd-$nqxxe!$8tpblrg2u_zvc#n*=gq^+mrxm3r%8i+')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False')
 
-ALLOWED_HOSTS = ["payment.dev-sti-group.biz.id", "localhost", "127.0.0.1"]
-CSRF_TRUSTED_ORIGINS = ["https://payment.dev-sti-group.biz.id"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", os.getenv('ALLOWED_HOSTS')]
 
+CSRF_TRUSTED_ORIGINS = [os.getenv('CSRF_TRUSTED_ORIGINS', '127.0.0.1')]
+
+BASEURL = os.getenv('BASEURL', 'http://127.0.0.1:8000')
 # Application definition
 
 INSTALLED_APPS = [
@@ -72,8 +74,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.getenv('DB_NAME', 'payment'),
+        'USER': os.getenv('DB_USER', 'root'),
+        'PASSWORD': os.getenv('DB_PASSWORD', 'password'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
@@ -120,5 +126,3 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-BASEURL = os.getenv('BASEURL')
