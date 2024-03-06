@@ -75,7 +75,7 @@
         $('.sender').prop('disabled', true).text('Loading...');
       });
       $(document).on('htmx:afterRequest', function(event) {
-        $('.sender').prop('disabled', false).text('Bayar Sekarang');
+        $('.sender').prop('disabled', false).text('Check Status');
       });
     </script>
     {% block javascripts %}{% endblock javascripts %}

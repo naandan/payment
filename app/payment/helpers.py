@@ -58,3 +58,6 @@ def verify_signature(merchant_code, merchant_key, signature_to_verify, timestamp
         return True
     else:
         return False
+
+def get_callback_url(transaction):
+    return f"{transaction.callback_url}?transactionCode={transaction.code}&invoiceCode={transaction.invoice_code}&merchantCode={transaction.merchant.code}"

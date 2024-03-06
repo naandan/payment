@@ -16,8 +16,8 @@
 }
 
 .payment-content{
-    min-height: 291px !important;
-    max-height: 291px !important;
+    min-height: 320px !important;
+    max-height: 320px !important;
     overflow-y: auto;
 }
 .footer{
@@ -27,8 +27,8 @@
     position: static;
 }
 .content-pay{
-    min-height: 339px;
-    max-height: 339px;
+    min-height: 368px;
+    max-height: 368px;
     overflow-y: auto;
 }
 

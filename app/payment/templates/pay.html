@@ -9,8 +9,22 @@
         </h2>
         <div id="collapsePesanan" class="accordion-collapse collapse" data-bs-parent="#accordionPesanan">
           <div class="accordion-body">
-            <h3>Nama Pesanan</h3>
-            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Excepturi corporis labore eaque tempora incidunt reiciendis aliquam culpa deserunt dignissimos atque, dolor eveniet quaerat nisi officiis! Dolor ratione minus tenetur eaque.</p>
+            {% for item in transaction.items.all %}
+            <div class="row">
+              <div class="col"> 
+                <h6>{{ item.name }}</h6>
+                <p class="m-0">Harga: Rp. {{ item.price }}</p>
+                <p class="m-0">Jumlah: {{ item.quantity }}</p>
+              </div>
+            </div>
+            <hr>
+            {% endfor %}
+            <div class="row">
+              <div class="col"> 
+                <h6>Total Harga</h6>
+                <p class="m-0">Rp. {{ transaction.amount }}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -22,7 +36,7 @@
         <div class="row w-100">
           <div class="col-10">
             <h6>Nomor Rekening</h6>
-            <p class="m-0" id="account_number">7007 0140 0395 8299</p>
+            <p class="m-0" id="account_number">{{ transaction.payment_method.account_number }}</p>
           </div>
           <div class="col-2 d-flex align-items-center justify-content-center">
             <p onclick="copyToClipboard('account_number')" class="m-0">
@@ -34,17 +48,25 @@
     <div class="payment-item bg-white px-4 py-3">
         <div class="row w-100">
           <div class="col-10">
-            <h6>Status Pembayaran</h6>
-            <p class="m-0" id="status">
-              {% if transaction.status == 1 %}
-                <span class="badge text-bg-success">{{ transaction.get_status_display }}</span>
-              {% else %}
-                <span class="badge text-bg-warning">{{ transaction.get_status_display }}</span>
-              {% endif %}
-            </p>
+            <h6>Jumlah Pembayaran</h6>
+            <p class="m-0">Rp. {{ transaction.amount }}</p>
           </div>
         </div>
     </div>
+    <div class="payment-item bg-white px-4 py-3">
+      <div class="row w-100">
+        <div class="col-10">
+          <h6>Status Pembayaran</h6>
+          <p class="m-0" id="status">
+            {% if transaction.status == 1 %}
+              <span class="badge text-bg-success">{{ transaction.get_status_display }}</span>
+            {% else %}
+              <span class="badge text-bg-warning">{{ transaction.get_status_display }}</span>
+            {% endif %}
+          </p>
+        </div>
+      </div>
+  </div>
   </div>
 
   <div class="bg-white shadow mt-3">
@@ -105,6 +127,9 @@
   $(document).on('htmx:afterRequest', function(event) {
     var code = event.detail.xhr.response;
     if (code == '001' || code.startsWith('http')) {
+        $('#status').html(
+            '<span class="badge text-bg-success">Success</span>'
+        );
         Toast.fire({
             icon: "success",
             title: "Transaction Success"

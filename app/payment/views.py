@@ -92,7 +92,7 @@ class PaymentView(View):
         if not transaction:
             return HttpResponseNotFound()
         if transaction.status == 1:
-            return HttpResponseRedirect(transaction.callback_url)
+            return HttpResponseRedirect(get_callback_url(transaction))
         
         payment_methods = PaymentMethod.objects.all()
         return render(request, 'payment.html', {
@@ -111,7 +111,7 @@ class PaymentView(View):
             return HttpResponseNotFound()
 
         if transaction.status == 1:
-            return HttpResponseRedirect(transaction.callback_url)
+            return HttpResponseRedirect(get_callback_url(transaction))
         
         payment_method = PaymentMethod.objects.filter(id=payment_method).first()
         if not payment_method:
@@ -136,7 +136,7 @@ class CheckPaymentView(View):
             return HttpResponseNotFound()
 
         if transaction.status == 1:
-            return HttpResponse(transaction.callback_url)
+            return HttpResponse(get_callback_url(transaction))
         
         if transaction.check_count != 0:
             if get_datetime_now() < get_expired_at(transaction.check_count * 2,transaction.check_time):
@@ -148,9 +148,42 @@ class CheckPaymentView(View):
         if status:
             transaction.status = 1
             transaction.save()
-            return HttpResponse(transaction.callback_url)
+            return HttpResponse(get_callback_url(transaction))
         else :
             transaction.check_count += 1
             transaction.check_time = get_datetime_now()
             transaction.save()
             return HttpResponse('002')
+
+class ConfirmPayment(APIView):
+    def validate_header(self, request):
+        if 'signature' not in request.headers or not request.headers["signature"]:
+            return False
+        if 'timestamp' not in request.headers or not request.headers["timestamp"]:
+            return False
+        if 'merchantcode' not in request.headers or not request.headers["merchantcode"]:
+            return False
+        return True
+    
+    def get(self, request, *args, **kwargs):
+        if not request.GET.get('code'):
+            return HttpResponseNotFound()
+        if not self.validate_header(request):
+            return Response({'message': 'Invalid header'}, status=status.HTTP_400_BAD_REQUEST)
+        merchant = Merchant.objects.filter(code=request.headers["merchantcode"]).first()
+        if merchant is None:
+            return Response({'message': 'Merchant not found'}, status=status.HTTP_400_BAD_REQUEST)
+        if not verify_signature(merchant.code, merchant.api_key, request.headers["signature"], request.headers["timestamp"]):
+            return Response({'message': 'Invalid signature'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        transaction = Transaction.objects.filter(code=request.GET.get('code')).first()
+        if transaction is None:
+            return Response({'message': 'Transaction not found'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({
+            'transactionCode': transaction.code,
+            'invoiceCode': transaction.invoice_code,
+            'amount': transaction.amount,
+            'status': transaction.status
+        }, status=status.HTTP_200_OK)
+        
