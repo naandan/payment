@@ -1,7 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from payment.serializer import TransactionSerializer, HeaderSerializer
+from payment.serializer import TransactionSerializer
 from payment.models import Transaction, Merchant, CustomerDetails, TransactionItem, PaymentMethod
 from django.views.generic import View
 from django.shortcuts import render
@@ -9,13 +9,11 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.template.loader import render_to_string
 from payment.helpers import *
 import math
-from django_htmx.http import HttpResponseClientRefresh, HttpResponseClientRedirect
-import json
 
 class TransactionCreateView(APIView):
     def save_transaction(self, data):
         merchant = Merchant.objects.filter(code=data['merchantCode']).first()
-        
+            
         transaction = Transaction.objects.filter(invoice_code=data['invoiceCode']).first()
         if transaction is not None:
             return {'transaction': transaction, 'status': 'exists'}
