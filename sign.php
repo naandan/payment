@@ -7,8 +7,8 @@ function generate_signature($merchantCode, $merchantKey, $timestamp) {
 
 // $timestamp = round(microtime(true) * 1000);
 
-$merchantCode = 'SP24168';
-$merchantKey = '73f8855dbda8d8eb5423752ef5c1b7e92b25a4a3';
+$merchantCode = 'SP73845';
+$merchantKey = '7c77f189df1e647d1ff0baf5e0c6c1d601f68c2d';
 $timestamp = 12130928;
 $signature = generate_signature($merchantCode, $merchantKey, $timestamp);
 echo $signature;

@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 import uuid
+from payment.helpers import generate_payment_code
 
 class Merchant(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -51,13 +52,10 @@ class Transaction(models.Model):
     invoice_code = models.CharField(max_length=10, unique=True)
     status = models.PositiveIntegerField(choices=STATUS, default=0)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_method = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE, related_name='transactions', null=True)
+    paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     merchant = models.ForeignKey(Merchant, on_delete=models.CASCADE, related_name='transactions')
     callback_url = models.URLField()
-    expire_priod = models.IntegerField(null=True, blank=True)
-    expired_at = models.DateTimeField(null=True, blank=True)
-    check_count = models.IntegerField(default=0)
-    check_time = models.DateTimeField(null=True)
+    return_url = models.URLField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -67,6 +65,35 @@ class Transaction(models.Model):
     class Meta:
         verbose_name = 'Transaction'
         verbose_name_plural = 'Transactions'
+
+class Pay(models.Model):
+    STATUS = (
+        (0, 'Pending'),
+        (1, 'Success'),
+        (2, 'Failed'),
+    )
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE, related_name='pays')
+    payment_method = models.ForeignKey(PaymentMethod, on_delete=models.CASCADE, null=True, related_name='pays')
+    payment_code = models.CharField(max_length=10, unique=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    status = models.PositiveIntegerField(choices=STATUS, default=0)
+    expire_priod = models.IntegerField(null=True, blank=True)
+    expired_at = models.DateTimeField(null=True, blank=True)
+    check_count = models.IntegerField(default=0)
+    check_time = models.DateTimeField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.payment_code + ' - ' + self.transaction.code)
+
+    class Meta:
+        verbose_name = 'Pay'
+        verbose_name_plural = 'Pays'
+        ordering = ['-created_at']
 
 class TransactionItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

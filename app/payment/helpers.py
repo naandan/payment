@@ -23,6 +23,10 @@ def generate_transaction_code():
     unique_numbers = random.sample(range(1, 9), 5)
     return "TR" + "".join(map(str, unique_numbers))
 
+def generate_payment_code():
+    unique_numbers = random.sample(range(1, 9), 5)
+    return "PAY" + "".join(map(str, unique_numbers))
+
 
 wib = pytz.timezone('Asia/Jakarta')
 now = datetime.now(wib)
@@ -59,5 +63,17 @@ def verify_signature(merchant_code, merchant_key, signature_to_verify, timestamp
     else:
         return False
 
+def validate_header(request):
+        if 'signature' not in request.headers or not request.headers["signature"]:
+            return False
+        if 'timestamp' not in request.headers or not request.headers["timestamp"]:
+            return False
+        if 'merchantcode' not in request.headers or not request.headers["merchantcode"]:
+            return False
+        return True
+
 def get_callback_url(transaction):
     return f"{transaction.callback_url}?transactionCode={transaction.code}&invoiceCode={transaction.invoice_code}&merchantCode={transaction.merchant.code}"
+
+def get_return_url(transaction):
+    return f"{transaction.return_url}?transactionCode={transaction.code}&invoiceCode={transaction.invoice_code}&merchantCode={transaction.merchant.code}"

@@ -12,7 +12,7 @@
             {% for item in transaction.items.all %}
             <div class="row">
               <div class="col"> 
-                <h6>{{ item.name }}</h6>
+                <h6>{{ item.name|capfirst }}</h6>
                 <p class="m-0">Harga: Rp. {{ item.price }}</p>
                 <p class="m-0">Jumlah: {{ item.quantity }}</p>
               </div>
@@ -25,6 +25,22 @@
                 <p class="m-0">Rp. {{ transaction.amount }}</p>
               </div>
             </div>
+            {% for pay in transaction.pays.all %}
+            {% if pay.status == 1 %}
+            <hr>
+              <div class="row">
+                <div class="col"> 
+                  <p class="m-0">- Rp. {{ pay.paid }}</p>
+                  <p class="m-0">{{ pay.payment_method.name }}</p>
+                </div>
+              </div>
+              {% endif %}
+            {% endfor %}
+            {% if transaction.pays.all|length > 1 %}
+            <hr>
+            <h6>Sisa Pembayaran</h6>
+            <p class="m-0">Rp. {{ transaction.total }}</p>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -36,7 +52,7 @@
         <div class="row w-100">
           <div class="col-10">
             <h6>Nomor Rekening</h6>
-            <p class="m-0" id="account_number">{{ transaction.payment_method.account_number }}</p>
+            <p class="m-0" id="account_number">{{ transaction.pays.first.payment_method.account_number }}</p>
           </div>
           <div class="col-2 d-flex align-items-center justify-content-center">
             <p onclick="copyToClipboard('account_number')" class="m-0">
@@ -46,10 +62,23 @@
         </div>
     </div>
     <div class="payment-item bg-white px-4 py-3">
+      <div class="row w-100">
+        <div class="col-10">
+          <h6>Catan Pembayaran</h6>
+          <p class="m-0" id="note">#{{ payment.payment_code }}</p>
+        </div>
+        <div class="col-2 d-flex align-items-center justify-content-center">
+          <p onclick="copyToClipboard('note')" class="m-0">
+            <iconify-icon icon="uil:copy" class="copy-btn p-0 m-0"></iconify-icon>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="payment-item bg-white px-4 py-3">
         <div class="row w-100">
           <div class="col-10">
             <h6>Jumlah Pembayaran</h6>
-            <p class="m-0">Rp. {{ transaction.amount }}</p>
+            <p class="m-0 currency">Rp. {{ transaction.amount }}</p>
           </div>
         </div>
     </div>
@@ -114,7 +143,7 @@
 <div class="w-100 bottom-0 Z-100 footer bg-white d-flex justify-content-between align-items-center shadow-lg w-full px-3 py-2 w-100 bottom-0">
   <div class="py-1">
     <h6 class="m-0">Total Pembayaran</h6>
-    <p class="m-0">Rp. 100.000</p>
+    <p class="m-0 currency">Rp. {{ transaction.total }}</p>
   </div>
   <form hx-get="{{url_check}}" method="get" hx-swap="none">
     <button class="sender btn btn-primary ms-auto" type="submit">Check Status</button>
@@ -150,6 +179,9 @@
     }
     $('.sender').prop('disabled', false).text('Check Status');
   });
+  $('.currency').text(function(i, val) {
+    return val.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1.");
+  })
 </script>
 
 <script>
